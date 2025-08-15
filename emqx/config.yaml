@@ -1,5 +1,5 @@
 ---
-name: EMQX(RPH）
+name: EMQX
 version: dev
 slug: emqx
 description: The most scalable open-source MQTT broker for IoT. An alternative for the Mosquitto add-on
@@ -11,7 +11,7 @@ ingress_port: 18083
 ingress_stream: true
 init: false
 panel_icon: mdi:pipe
-panel_title: EMQX(RPH)
+panel_title: EMQX
 arch:
   - aarch64
   - amd64

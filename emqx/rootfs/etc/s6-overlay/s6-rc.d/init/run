@@ -14,5 +14,5 @@ fi
 yq eval '
   .dashboard.auth.method = "basic" |
   .dashboard.auth.basic.username = "admin" |
-  .dashboard.auth.basic.password = "secret123"
+  .dashboard.auth.basic.password = "public"
 ' -i /opt/emqx/etc/config.yaml

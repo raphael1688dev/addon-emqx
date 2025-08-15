@@ -1,0 +1,6 @@
+dashboard:
+  auth:
+    method: basic
+    basic:
+      username: admin
+      password: public

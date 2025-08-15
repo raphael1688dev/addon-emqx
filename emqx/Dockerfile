@@ -27,6 +27,17 @@ RUN \
 # Copy root filesystem
 COPY rootfs /
 
+#
+RUN ARCH=$(uname -m) && \
+    case "$ARCH" in \
+      x86_64) YQ_URL="https://github.com/mikefarah/yq/releases/download/v4.40.5/yq_linux_amd64" ;; \
+      aarch64) YQ_URL="https://github.com/mikefarah/yq/releases/download/v4.40.5/yq_linux_arm64" ;; \
+      armv7l) YQ_URL="https://github.com/mikefarah/yq/releases/download/v4.40.5/yq_linux_arm" ;; \
+      *) echo "Unsupported arch: $ARCH" && exit 1 ;; \
+    esac && \
+    curl -sL "$YQ_URL" -o /usr/bin/yq && chmod +x /usr/bin/yq
+
+
 WORKDIR /opt/emqx
 
 #healthcheck

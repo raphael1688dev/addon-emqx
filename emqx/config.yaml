@@ -3,7 +3,7 @@ name: EMQX
 version: dev
 slug: emqx
 description: The most scalable open-source MQTT broker for IoT. An alternative for the Mosquitto add-on
-url: https://github.com/raphael1688dev/addon-emqx
+url: https://github.com/raphael1688dev/addon-emqx/emqx
 startup: services
 ingress: true
 ingress_port: 18083

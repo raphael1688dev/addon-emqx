@@ -2,7 +2,7 @@
 name: EMQX
 version: dev
 slug: emqx
-description: Version 5.10.0
+description: Version 5.9.1
 url: https://github.com/raphael1688dev/addon-emqx
 startup: services
 ingress: true

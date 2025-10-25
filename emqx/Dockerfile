@@ -1,4 +1,4 @@
-ARG BUILD_FROM=ghcr.io/hassio-addons/debian-base:7.8.3
+ARG BUILD_FROM=ghcr.io/hassio-addons/debian-base:8.1.4
 # hadolint ignore=DL3006
 FROM ${BUILD_FROM}
 
@@ -7,17 +7,17 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # Setup base system
 ARG BUILD_ARCH=amd64
-ARG EMQX_VERSION="5.9.1"
+ARG EMQX_VERSION="5.10.1"
 RUN \
     apt-get update \
     && apt-get install -y --no-install-recommends \
-        procps=2:4.0.2-3 \
+        procps=2:4.0.4-9 \
     \
     && mkdir /opt/emqx \
     && ARCH="${BUILD_ARCH}" \
     && if [ "${BUILD_ARCH}" = "aarch64" ]; then ARCH="arm64"; fi \
     && curl -L -s \
-        "https://github.com/emqx/emqx/releases/download/e${EMQX_VERSION}/emqx-enterprise-${EMQX_VERSION#}-debian12-${ARCH}.tar.gz" \
+        "https://github.com/emqx/emqx/releases/download/e${EMQX_VERSION}/emqx-enterprise-${EMQX_VERSION#}-debian13-${ARCH}.tar.gz" \
         | tar zxvf - -C /opt/emqx \
     && rm -fr \
         /opt/emqx/log \

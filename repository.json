@@ -1,5 +1,5 @@
 {
-  "name": "Home Assistant Add-on: EMQX 5.10.1",
+  "name": "Home Assistant Add-on: EMQX 5.10.3",
   "url": "https://github.com/raphael1688dev/addon-emqx",
   "maintainer": "Forked from codenotary@frenck.dev"
 }

@@ -1,8 +1,8 @@
 ---
 name: EMQX
-version: 5.10.5-1
+version: 5.10.5-2
 slug: emqx
-description: Version 5.10.5-1
+description: Version 5.10.5-2
 url: https://github.com/raphael1688dev/addon-emqx
 startup: services
 ingress: true
@@ -23,6 +23,11 @@ options:
   websocket_port: 8083
   wss_port: 8084
   log_level: warning
+  ssl_certfile: "/ssl/fullchain.pem"
+  ssl_keyfile: "/ssl/privkey.pem"
+  ssl_cacertfile: ""
+  telemetry_enable: false
+  max_packet_size: "1MB"
   env_vars: []
 host_network: true
 schema:
@@ -32,6 +37,11 @@ schema:
   websocket_port: port
   wss_port: port
   log_level: list(debug|info|warning|error|critical)
+  ssl_certfile: str?
+  ssl_keyfile: str?
+  ssl_cacertfile: str?
+  telemetry_enable: bool
+  max_packet_size: str
   env_vars:
     - name: match(^EMQX_([A-Z0-9_])+$)
       value: str

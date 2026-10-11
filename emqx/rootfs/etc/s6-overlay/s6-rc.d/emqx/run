@@ -41,6 +41,35 @@ if bashio::config.has_value 'log_level'; then
     export EMQX_LOG__CONSOLE__LEVEL=$(bashio::config 'log_level')
 fi
 
+if bashio::config.has_value 'ssl_certfile'; then
+    certfile=$(bashio::config 'ssl_certfile')
+    if [ -n "${certfile}" ] && [ -f "${certfile}" ]; then
+        export EMQX_LISTENERS__SSL__DEFAULT__SSL_OPTIONS__CERTFILE="${certfile}"
+    fi
+fi
+
+if bashio::config.has_value 'ssl_keyfile'; then
+    keyfile=$(bashio::config 'ssl_keyfile')
+    if [ -n "${keyfile}" ] && [ -f "${keyfile}" ]; then
+        export EMQX_LISTENERS__SSL__DEFAULT__SSL_OPTIONS__KEYFILE="${keyfile}"
+    fi
+fi
+
+if bashio::config.has_value 'ssl_cacertfile'; then
+    cacertfile=$(bashio::config 'ssl_cacertfile')
+    if [ -n "${cacertfile}" ] && [ -f "${cacertfile}" ]; then
+        export EMQX_LISTENERS__SSL__DEFAULT__SSL_OPTIONS__CACERTFILE="${cacertfile}"
+    fi
+fi
+
+if bashio::config.has_value 'telemetry_enable'; then
+    export EMQX_TELEMETRY__ENABLE=$(bashio::config 'telemetry_enable')
+fi
+
+if bashio::config.has_value 'max_packet_size'; then
+    export EMQX_MQTT__MAX_PACKET_SIZE=$(bashio::config 'max_packet_size')
+fi
+
 # Load custom environment variables
 for var in $(bashio::config 'env_vars|keys'); do
     name=$(bashio::config "env_vars[${var}].name")

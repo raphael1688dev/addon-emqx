@@ -83,6 +83,26 @@ The port for MQTT over secure WebSocket (default: `8084`).
 
 The console log level for EMQX (`debug`, `info`, `warning`, `error`, `critical`). Default: `warning`.
 
+### Option: `ssl_certfile` (optional)
+
+Path to the SSL certificate or fullchain file (e.g. `/ssl/fullchain.pem`). If the file exists, it will be automatically applied to the SSL listener (port `8883`).
+
+### Option: `ssl_keyfile` (optional)
+
+Path to the SSL private key file (e.g. `/ssl/privkey.pem`).
+
+### Option: `ssl_cacertfile` (optional)
+
+Path to the CA certificate file if mutual/client certificate verification is required.
+
+### Option: `telemetry_enable`
+
+Toggle anonymous telemetry data reporting to EMQX (`true` or `false`). Default: `false`.
+
+### Option: `max_packet_size`
+
+Maximum allowed MQTT packet size (default: `1MB`, e.g. `5MB`, `10MB`).
+
 ### Option: `env_vars`
 
 This option allows you to tweak every advanced aspect of EMQX by setting

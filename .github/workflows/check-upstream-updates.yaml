@@ -1,0 +1,93 @@
+name: Check Upstream Updates
+
+on:
+  schedule:
+    # Run every Monday at 02:00 UTC (10:00 UTC+8)
+    - cron: '0 2 * * 1'
+  workflow_dispatch:
+
+jobs:
+  check-updates:
+    name: Check EMQX & Base Image Releases
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Inspect current local versions
+        id: local
+        run: |
+          CURRENT_EMQX=$(grep 'ARG EMQX_VERSION=' emqx/Dockerfile | cut -d'"' -f2)
+          CURRENT_MAJOR=$(echo "${CURRENT_EMQX}" | cut -d'.' -f1)
+          CURRENT_BASE=$(grep 'ARG BUILD_FROM=' emqx/Dockerfile | cut -d':' -f2 | awk '{print $1}')
+          
+          echo "current_emqx=${CURRENT_EMQX}" >> "$GITHUB_OUTPUT"
+          echo "current_major=${CURRENT_MAJOR}" >> "$GITHUB_OUTPUT"
+          echo "current_base=${CURRENT_BASE}" >> "$GITHUB_OUTPUT"
+          
+          echo "### 📦 Current Local Add-on Configuration" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **EMQX Version**: \`${CURRENT_EMQX}\` (Series: \`${CURRENT_MAJOR}.x\`)" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Debian Base Image**: \`${CURRENT_BASE}\`" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Check upstream releases
+        id: upstream
+        run: |
+          # 1. Check Debian Base
+          LATEST_BASE=$(curl -sL https://api.github.com/repos/hassio-addons/addon-debian-base/releases/latest | jq -r .tag_name | sed 's/^v//')
+          echo "latest_base=${LATEST_BASE}" >> "$GITHUB_OUTPUT"
+          
+          # 2. Check EMQX for the current major branch
+          CURRENT_MAJOR="${{ steps.local.outputs.current_major }}"
+          LATEST_EMQX=$(curl -sL https://api.github.com/repos/emqx/emqx/releases?per_page=50 | jq -r '.[].tag_name' | sed -E 's/^[ev]//' | grep "^${CURRENT_MAJOR}\." | sort -V | tail -n 1)
+          echo "latest_emqx=${LATEST_EMQX}" >> "$GITHUB_OUTPUT"
+
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "### 🌐 Upstream Latest Versions" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Upstream EMQX ${CURRENT_MAJOR}.x**: \`${LATEST_EMQX}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Upstream Debian Base**: \`${LATEST_BASE}\`" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Evaluate differences and notify
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          CURR_EMQX="${{ steps.local.outputs.current_emqx }}"
+          LATEST_EMQX="${{ steps.upstream.outputs.latest_emqx }}"
+          CURR_BASE="${{ steps.local.outputs.current_base }}"
+          LATEST_BASE="${{ steps.upstream.outputs.latest_base }}"
+
+          UPDATE_FOUND=false
+          BODY="## 🔔 Upstream Updates Detected\n\n"
+
+          if [ "${CURR_EMQX}" != "${LATEST_EMQX}" ] && [ -n "${LATEST_EMQX}" ]; then
+            UPDATE_FOUND=true
+            BODY="${BODY}- 🚀 **EMQX**: Current version \`${CURR_EMQX}\` can be upgraded to \`${LATEST_EMQX}\`.\n  - [EMQX Releases](https://github.com/emqx/emqx/releases)\n"
+          fi
+
+          if [ "${CURR_BASE}" != "${LATEST_BASE}" ] && [ -n "${LATEST_BASE}" ]; then
+            UPDATE_FOUND=true
+            BODY="${BODY}- 📦 **Debian Base Image**: Current base \`${CURR_BASE}\` can be upgraded to \`${LATEST_BASE}\`.\n  - [Debian Base Releases](https://github.com/hassio-addons/addon-debian-base/releases)\n"
+          fi
+
+          if [ "${UPDATE_FOUND}" = "true" ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "⚠️ **Updates are available!**" >> "$GITHUB_STEP_SUMMARY"
+            printf "%b\n" "${BODY}" >> "$GITHUB_STEP_SUMMARY"
+
+            # Check if an issue with the same title already exists
+            TITLE="[Upstream Update] New EMQX or Base Image version available"
+            EXISTING=$(gh issue list --search "${TITLE}" --state open --json number -q '.[0].number')
+
+            if [ -z "${EXISTING}" ]; then
+              gh issue create --title "${TITLE}" --body "$(printf "%b" "${BODY}")"
+              echo "Created GitHub Issue for the updates."
+            else
+              echo "Issue #${EXISTING} already open. Skipping duplication."
+            fi
+          else
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "✅ **All components are currently up to date!**" >> "$GITHUB_STEP_SUMMARY"
+          fi

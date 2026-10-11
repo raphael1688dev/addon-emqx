@@ -10,3 +10,17 @@ mkdir -p \
   /data/emqx/log \
   /data/emqx/plugins
 
+# Track version upgrade from 5.x to 6.x
+VERSION_FILE="/data/emqx/.version"
+CURRENT_VERSION="6.3.1"
+
+if [ -f "${VERSION_FILE}" ]; then
+  PREV_VERSION=$(cat "${VERSION_FILE}")
+  if [[ "${PREV_VERSION}" =~ ^5\. ]]; then
+    bashio::log.notice "Upgrading EMQX data directory from ${PREV_VERSION} to ${CURRENT_VERSION}."
+    bashio::log.notice "Note: EMQX 6.x utilizes a new durable storage engine. Existing 5.x durable session state will be cleanly reset."
+  fi
+fi
+
+echo "${CURRENT_VERSION}" > "${VERSION_FILE}"
+

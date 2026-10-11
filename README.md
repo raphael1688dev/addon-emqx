@@ -45,9 +45,10 @@ website, this add-on runs EMQX in a fully local, self-hosted environment.
 
 This fork of the EMQX Add-on provides an upgraded, reliable, and production-ready experience:
 
-- **EMQX Enterprise 5.10.5 (Final 5.x Release)**:
-  - Security hardening: Resolves path-traversal vulnerabilities and protects sensitive API endpoints.
-  - Complete modern IoT feature suite: AI/LLM integration in Flows, NATS protocol gateway, TLS 1.3 session tickets, and powerful Rule Engine data sinks.
+- **EMQX Enterprise 6.3.1 (Latest LTS Release)**:
+  - Long-Term Support (LTS) release maintained through September 2029.
+  - Full BSL 1.1 enterprise feature suite unlocked: high-throughput MQTT Streams, Apache Parquet data sinks, and native Durable Storage engine.
+  - Advanced Feature Gates and hardened security with a PCRE2-powered Rule Engine.
 - **Latest Debian 13 Base Image**:
   - Built on `ghcr.io/hassio-addons/debian-base:9.5.0` (Debian 13.7 Trixie).
   - Uses S6-Overlay `3.2.3.0` and the latest `bashio` library for enhanced supervisor compatibility.

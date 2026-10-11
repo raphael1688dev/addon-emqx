@@ -41,6 +41,24 @@ website, this add-on runs EMQX in a fully local, self-hosted environment.
 
 [:books: Read the full add-on documentation][docs]
 
+## Key Features & Enhancements
+
+This fork of the EMQX Add-on provides an upgraded, reliable, and production-ready experience:
+
+- **EMQX Enterprise 5.10.5 (Final 5.x Release)**:
+  - Security hardening: Resolves path-traversal vulnerabilities and protects sensitive API endpoints.
+  - Complete modern IoT feature suite: AI/LLM integration in Flows, NATS protocol gateway, TLS 1.3 session tickets, and powerful Rule Engine data sinks.
+- **Latest Debian 13 Base Image**:
+  - Built on `ghcr.io/hassio-addons/debian-base:9.5.0` (Debian 13.7 Trixie).
+  - Uses S6-Overlay `3.2.3.0` and the latest `bashio` library for enhanced supervisor compatibility.
+- **Persistent Log Storage**:
+  - Automatically redirects and stores EMQX logs under `/data/emqx/log`, ensuring logs survive container restarts and add-on updates.
+- **Home Assistant Configuration UI**:
+  - Tune standard ports (`mqtt_port`, `mqtts_port`, `websocket_port`, `wss_port`) and `log_level` directly from the Home Assistant add-on configuration tab.
+  - Securely bootstrap the Dashboard admin password via a masked password field.
+- **Advanced Environment Variable Overrides**:
+  - Fully supports overriding any EMQX HOCON configuration parameter via the `env_vars` option.
+
 ## Support
 
 Got questions?
@@ -108,29 +126,29 @@ SOFTWARE.
 [amd64-shield]: https://img.shields.io/badge/amd64-yes-green.svg
 
 
-[commits-shield]: https://img.shields.io/github/commit-activity/y/hassio-addons/addon-emqx.svg
-[commits]: https://github.com/hassio-addons/addon-emqx/commits/main
-[contributors]: https://github.com/hassio-addons/addon-emqx/graphs/contributors
+[commits-shield]: https://img.shields.io/github/commit-activity/y/raphael1688dev/addon-emqx.svg
+[commits]: https://github.com/raphael1688dev/addon-emqx/commits/main
+[contributors]: https://github.com/raphael1688dev/addon-emqx/graphs/contributors
 [discord-ha]: https://discord.gg/c5DvZ4e
 [discord-shield]: https://img.shields.io/discord/478094546522079232.svg
 [discord]: https://discord.me/hassioaddons
-[docs]: https://github.com/hassio-addons/addon-emqx/blob/main/emqx/DOCS.md
+[docs]: https://github.com/raphael1688dev/addon-emqx/blob/main/emqx/DOCS.md
 [emqx]: https://www.emqx.io/
 [forum-shield]: https://img.shields.io/badge/community-forum-brightgreen.svg
 [forum]: https://community.home-assistant.io/?u=frenck
 [frenck]: https://github.com/frenck
-[github-actions-shield]: https://github.com/hassio-addons/addon-emqx/workflows/CI/badge.svg
-[github-actions]: https://github.com/hassio-addons/addon-emqx/actions
+[github-actions-shield]: https://github.com/raphael1688dev/addon-emqx/workflows/CI/badge.svg
+[github-actions]: https://github.com/raphael1688dev/addon-emqx/actions
 [github-sponsors-shield]: https://frenck.dev/wp-content/uploads/2019/12/github_sponsor.png
 [github-sponsors]: https://github.com/sponsors/frenck
 
-[issue]: https://github.com/hassio-addons/addon-emqx/issues
-[license-shield]: https://img.shields.io/github/license/hassio-addons/addon-emqx.svg
-[maintenance-shield]: https://img.shields.io/maintenance/yes/2025.svg
+[issue]: https://github.com/raphael1688dev/addon-emqx/issues
+[license-shield]: https://img.shields.io/github/license/raphael1688dev/addon-emqx.svg
+[maintenance-shield]: https://img.shields.io/maintenance/yes/2026.svg
 [patreon-shield]: https://frenck.dev/wp-content/uploads/2019/12/patreon.png
 [patreon]: https://www.patreon.com/frenck
 [project-stage-shield]: https://img.shields.io/badge/project%20stage-experimental-yellow.svg
 [reddit]: https://reddit.com/r/homeassistant
-[releases-shield]: https://img.shields.io/github/release/hassio-addons/addon-emqx.svg
-[releases]: https://github.com/hassio-addons/addon-emqx/releases
+[releases-shield]: https://img.shields.io/github/release/raphael1688dev/addon-emqx.svg
+[releases]: https://github.com/raphael1688dev/addon-emqx/releases
 [repository]: https://github.com/hassio-addons/repository

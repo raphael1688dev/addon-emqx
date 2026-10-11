@@ -56,6 +56,11 @@ mqtts_port: 8883
 websocket_port: 8083
 wss_port: 8084
 log_level: warning
+ssl_certfile: "/ssl/fullchain.pem"
+ssl_keyfile: "/ssl/privkey.pem"
+ssl_cacertfile: ""
+telemetry_enable: false
+max_packet_size: "1MB"
 env_vars: []
 ```
 

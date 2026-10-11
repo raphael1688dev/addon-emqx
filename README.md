@@ -56,8 +56,53 @@ This fork of the EMQX Add-on provides an upgraded, reliable, and production-read
 - **Home Assistant Configuration UI**:
   - Tune standard ports (`mqtt_port`, `mqtts_port`, `websocket_port`, `wss_port`) and `log_level` directly from the Home Assistant add-on configuration tab.
   - Securely bootstrap the Dashboard admin password via a masked password field.
+- **SSL / TLS Certificate Integration**:
+  - Direct integration with Home Assistant SSL certificates (e.g., Let's Encrypt fullchain and private key via `/ssl`).
+  - Safe existence verification: Gracefully falls back to self-signed test certificates if custom certificates are not found on disk, preventing startup failures.
+- **Privacy & Traffic Tuning**:
+  - Built-in `telemetry_enable` toggle (defaults to `false` for complete privacy).
+  - Configurable `max_packet_size` to handle large payloads or IoT telemetry streams.
 - **Advanced Environment Variable Overrides**:
   - Fully supports overriding any EMQX HOCON configuration parameter via the `env_vars` option.
+
+## Configuration
+
+You can configure the EMQX add-on directly from the Home Assistant Configuration tab or via YAML.
+
+**Note**: *Remember to restart the add-on when configuration changes are made.*
+
+### Example Configuration
+
+```yaml
+default_admin_password: "mySecretPassword"
+mqtt_port: 1883
+mqtts_port: 8883
+websocket_port: 8083
+wss_port: 8084
+log_level: warning
+ssl_certfile: "/ssl/fullchain.pem"
+ssl_keyfile: "/ssl/privkey.pem"
+ssl_cacertfile: ""
+telemetry_enable: false
+max_packet_size: "1MB"
+env_vars: []
+```
+
+### Configuration Options
+
+- **`default_admin_password`** *(optional)*: Bootstraps the initial password for the EMQX Dashboard `admin` account.
+- **`mqtt_port`**: TCP port for standard MQTT traffic (default: `1883`).
+- **`mqtts_port`**: TCP port for encrypted MQTT SSL/TLS traffic (default: `8883`).
+- **`websocket_port`**: TCP port for MQTT over WebSocket (default: `8083`).
+- **`wss_port`**: TCP port for MQTT over secure WebSocket (default: `8084`).
+- **`log_level`**: Console log level for EMQX (`debug`, `info`, `warning`, `error`, `critical`). Default: `warning`.
+- **`ssl_certfile`** *(optional)*: Path to the SSL certificate or fullchain file (e.g., `/ssl/fullchain.pem`). Automatically applied to the MQTTS listener when present.
+- **`ssl_keyfile`** *(optional)*: Path to the SSL private key file (e.g., `/ssl/privkey.pem`).
+- **`ssl_cacertfile`** *(optional)*: Path to the CA certificate file if mutual/client certificate verification is required.
+- **`telemetry_enable`**: Enables or disables anonymous telemetry reporting to EMQX (default: `false`).
+- **`max_packet_size`**: Maximum allowed MQTT packet size (default: `1MB`, e.g., `5MB`, `10MB`).
+- **`env_vars`**: Custom environment variables for advanced HOCON configuration. Each entry must start with `EMQX_` (e.g., `EMQX_NODE__DATA_DIR`).
+
 
 ## Support
 

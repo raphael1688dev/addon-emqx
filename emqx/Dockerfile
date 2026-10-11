@@ -11,14 +11,14 @@ ARG EMQX_VERSION="5.10.4"
 RUN \
     apt-get update \
     && apt-get install -y --no-install-recommends \
-        procps=2:4.0.4-9 \
+        procps \
     \
     && mkdir /opt/emqx \
     && ARCH="${BUILD_ARCH}" \
     && if [ "${BUILD_ARCH}" = "aarch64" ]; then ARCH="arm64"; fi \
     && curl -L -s \
         "https://github.com/emqx/emqx/releases/download/e${EMQX_VERSION}/emqx-enterprise-${EMQX_VERSION#}-debian13-${ARCH}.tar.gz" \
-        | tar zxvf - -C /opt/emqx \
+        | tar zxf - -C /opt/emqx \
     && rm -fr \
         /opt/emqx/log \
         /var/{cache,log}/* \

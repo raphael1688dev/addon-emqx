@@ -14,7 +14,32 @@ export EMQX_NODE__ETC_DIR="/data/emqx/etc"
 export EMQX_NODE__NAME="${EMQX_NAME}@${EMQX_HOST}.local"
 export EMQX_PLUGINS__INSTALL_DIR="/data/emqx/plugins"
 export EMQX_RPC__PORT_DISCOVERY="manual"
-export EMQX_LOG_DIR="/config/log"
+export EMQX_LOG_DIR="/data/emqx/log"
+
+# Map Home Assistant configuration options to EMQX environment variables
+if bashio::config.has_value 'default_admin_password'; then
+    export EMQX_DASHBOARD__DEFAULT_PASSWORD=$(bashio::config 'default_admin_password')
+fi
+
+if bashio::config.has_value 'mqtt_port'; then
+    export EMQX_LISTENERS__TCP__DEFAULT__BIND="0.0.0.0:$(bashio::config 'mqtt_port')"
+fi
+
+if bashio::config.has_value 'mqtts_port'; then
+    export EMQX_LISTENERS__SSL__DEFAULT__BIND="0.0.0.0:$(bashio::config 'mqtts_port')"
+fi
+
+if bashio::config.has_value 'websocket_port'; then
+    export EMQX_LISTENERS__WS__DEFAULT__BIND="0.0.0.0:$(bashio::config 'websocket_port')"
+fi
+
+if bashio::config.has_value 'wss_port'; then
+    export EMQX_LISTENERS__WSS__DEFAULT__BIND="0.0.0.0:$(bashio::config 'wss_port')"
+fi
+
+if bashio::config.has_value 'log_level'; then
+    export EMQX_LOG__CONSOLE__LEVEL=$(bashio::config 'log_level')
+fi
 
 # Load custom environment variables
 for var in $(bashio::config 'env_vars|keys'); do

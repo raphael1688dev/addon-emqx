@@ -7,4 +7,6 @@
 mkdir -p \
   /data/emqx/data \
   /data/emqx/etc \
+  /data/emqx/log \
   /data/emqx/plugins
+

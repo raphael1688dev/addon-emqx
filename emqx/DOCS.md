@@ -43,36 +43,58 @@ _Notes:_
 
 ## Configuration
 
-You most likely don't need these configuration options. Almost all
-configuration can be done via the web UI that is available in this add-on.
-Some more advanced/complex configuration options are not available in the
-web UI, but can be configured using this option (for example, when
-setting up clustering of multiple instances).
+Add-on configuration can be tuned directly from the Home Assistant Configuration tab.
 
 **Note**: _Remember to restart the add-on when the configuration is changed._
 
 Example add-on configuration:
 
 ```yaml
-env_vars:
-  - name: EMQX_NODE__NAME
-    value: "something@else.local"
+default_admin_password: "mySecretPassword"
+mqtt_port: 1883
+mqtts_port: 8883
+websocket_port: 8083
+wss_port: 8084
+log_level: warning
+env_vars: []
 ```
 
-**Note**: _This is just an example, don't copy and paste it! Create your own!_
+### Option: `default_admin_password` (optional)
+
+Allows setting or bootstrapping the default administrator password for the EMQX Dashboard.
+
+### Option: `mqtt_port`
+
+The TCP port for standard MQTT traffic (default: `1883`).
+
+### Option: `mqtts_port`
+
+The SSL/TLS port for encrypted MQTT traffic (default: `8883`).
+
+### Option: `websocket_port`
+
+The port for MQTT over WebSocket (default: `8083`).
+
+### Option: `wss_port`
+
+The port for MQTT over secure WebSocket (default: `8084`).
+
+### Option: `log_level`
+
+The console log level for EMQX (`debug`, `info`, `warning`, `error`, `critical`). Default: `warning`.
 
 ### Option: `env_vars`
 
-This option allows you to tweak every aspect of EMQX by setting
-configuration options using environment variables. See the example at the
-start of this chapter to get an idea of how the configuration looks.
+This option allows you to tweak every advanced aspect of EMQX by setting
+configuration options using environment variables.
 
 For more information about using these variables, see the official EMQX
 documentation:
 
 <https://www.emqx.io/docs/en/v5.0/admin/cfg.html>
 
-**Note**: _Only environment variables starting with `EMQX_` are accepted.\_
+**Note**: _Only environment variables starting with `EMQX_` are accepted._
+
 
 ## Known issues and limitations
 

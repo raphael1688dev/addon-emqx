@@ -49,7 +49,7 @@ This fork of the EMQX Add-on provides an upgraded, reliable, and production-read
   - Security hardening: Resolves path-traversal vulnerabilities and protects sensitive API endpoints.
   - Complete modern IoT feature suite: AI/LLM integration in Flows, NATS protocol gateway, TLS 1.3 session tickets, and powerful Rule Engine data sinks.
 - **Latest Debian 13 Base Image**:
-  - Built on `ghcr.io/hassio-addons/debian-base:9.5.0` (Debian 13.7 Trixie).
+  - Built on `ghcr.io/hassio-addons/debian-base:9.5.1` (Debian 13.7 Trixie).
   - Uses S6-Overlay `3.2.3.0` and the latest `bashio` library for enhanced supervisor compatibility.
 - **Persistent Log Storage**:
   - Automatically redirects and stores EMQX logs under `/data/emqx/log`, ensuring logs survive container restarts and add-on updates.

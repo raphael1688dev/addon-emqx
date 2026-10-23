@@ -12,7 +12,7 @@ mkdir -p \
 
 # Track version upgrade from 5.x to 6.x
 VERSION_FILE="/data/emqx/.version"
-CURRENT_VERSION="6.3.1"
+CURRENT_VERSION="6.3.2"
 
 if [ -f "${VERSION_FILE}" ]; then
   PREV_VERSION=$(cat "${VERSION_FILE}")

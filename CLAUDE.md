@@ -50,6 +50,9 @@ When bumping EMQX or the base image, follow the repo's existing release conventi
   - `emqx/config.yaml` — `version` and `description`
   - `repository.json` — `name`
   - (6.x only) `emqx/rootfs/.../init-emqx/run` — `CURRENT_VERSION`, used for upgrade detection
+  - `CHANGELOG.md` — add an entry under the matching version line (6.x releases under the 6.x
+    section, 5.x under the 5.x section). Like this file, `CHANGELOG.md` is kept identical on both
+    branches, so the new entry is added on whichever branch you release and then carried to the other.
 - Bump the add-on revision suffix (`-N`, e.g. `6.3.2-0` → `6.3.2-1`) **even for a base-image-only
   change**, so Home Assistant detects an update.
 - Commit message format: `release: <version>-<rev> - <short description>`.

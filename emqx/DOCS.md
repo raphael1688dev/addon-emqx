@@ -61,6 +61,7 @@ ssl_keyfile: "/ssl/privkey.pem"
 ssl_cacertfile: ""
 telemetry_enable: false
 max_packet_size: "1MB"
+retainer_storage_type: disc
 env_vars: []
 ```
 
@@ -107,6 +108,17 @@ Toggle anonymous telemetry data reporting to EMQX (`true` or `false`). Default: 
 ### Option: `max_packet_size`
 
 Maximum allowed MQTT packet size (default: `1MB`, e.g. `5MB`, `10MB`).
+
+### Option: `retainer_storage_type`
+
+Storage backend for retained messages: `disc` or `ram`. Default: `disc`.
+
+**Note**: This default deviates from upstream EMQX. EMQX's own default is
+`ram`, which keeps retained messages in memory only and loses them whenever the
+broker restarts. This add-on defaults to `disc` so retained messages (e.g.
+Home Assistant MQTT discovery configs and `availability` topics) persist across
+restarts via the built-in database under `/data`. Set it to `ram` to restore
+the upstream EMQX behaviour.
 
 ### Option: `env_vars`
 

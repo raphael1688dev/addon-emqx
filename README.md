@@ -85,6 +85,7 @@ ssl_keyfile: "/ssl/privkey.pem"
 ssl_cacertfile: ""
 telemetry_enable: false
 max_packet_size: "1MB"
+retainer_storage_type: disc
 env_vars: []
 ```
 
@@ -101,6 +102,7 @@ env_vars: []
 - **`ssl_cacertfile`** *(optional)*: Path to the CA certificate file if mutual/client certificate verification is required.
 - **`telemetry_enable`**: Enables or disables anonymous telemetry reporting to EMQX (default: `false`).
 - **`max_packet_size`**: Maximum allowed MQTT packet size (default: `1MB`, e.g., `5MB`, `10MB`).
+- **`retainer_storage_type`**: Storage backend for retained messages (`disc` or `ram`, default: `disc`). Note: upstream EMQX defaults to `ram`, which loses retained messages on broker restart; this add-on defaults to `disc` so they persist across restarts. Set to `ram` for upstream behaviour.
 - **`env_vars`**: Custom environment variables for advanced HOCON configuration. Each entry must start with `EMQX_` (e.g., `EMQX_NODE__DATA_DIR`).
 
 

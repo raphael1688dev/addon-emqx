@@ -70,6 +70,16 @@ if bashio::config.has_value 'max_packet_size'; then
     export EMQX_MQTT__MAX_PACKET_SIZE=$(bashio::config 'max_packet_size')
 fi
 
+# Retainer storage backend.
+# NOTE: this deviates from upstream EMQX. EMQX's own default is "ram", which
+# keeps retained messages in memory only and loses them on every broker
+# restart. This add-on defaults the option to "disc" instead, so retained
+# messages persist across restarts via the built-in RocksDB store under /data.
+# Set the option to "ram" to restore the upstream EMQX behaviour.
+if bashio::config.has_value 'retainer_storage_type'; then
+    export EMQX_RETAINER__BACKEND__STORAGE_TYPE=$(bashio::config 'retainer_storage_type')
+fi
+
 # Load custom environment variables
 for var in $(bashio::config 'env_vars|keys'); do
     name=$(bashio::config "env_vars[${var}].name")

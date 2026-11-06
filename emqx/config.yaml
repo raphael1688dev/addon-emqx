@@ -1,8 +1,8 @@
 ---
 name: EMQX
-version: 6.3.2-2
+version: 6.3.2-3
 slug: emqx
-description: Version 6.3.2-2 (EMQX 6.x LTS)
+description: Version 6.3.2-3 (EMQX 6.x LTS)
 url: https://github.com/raphael1688dev/addon-emqx
 startup: services
 ingress: true
@@ -28,6 +28,7 @@ options:
   ssl_cacertfile: ""
   telemetry_enable: false
   max_packet_size: "1MB"
+  retainer_storage_type: disc
   env_vars: []
 host_network: true
 schema:
@@ -42,6 +43,7 @@ schema:
   ssl_cacertfile: str?
   telemetry_enable: bool
   max_packet_size: str
+  retainer_storage_type: list(ram|disc)
   env_vars:
     - name: match(^EMQX_([A-Z0-9_])+$)
       value: str

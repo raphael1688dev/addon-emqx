@@ -40,6 +40,13 @@ Both lines share the `ghcr.io/hassio-addons/debian-base` base image.
 
 ## 5.x line (`main`, stable)
 
+### 5.10.5-5 — 2026-11-06
+- Default the EMQX Retainer storage backend to `disc` (upstream EMQX defaults to
+  `ram`). Retained messages now persist across broker restarts instead of being
+  lost in memory. Add a `retainer_storage_type` option (`disc` | `ram`) to
+  override; the deviation from the EMQX default is documented in DOCS/README and
+  noted in the service script.
+
 ### 5.10.5-4 — 2026-11-05
 - Upgrade base image to `debian-base` 9.5.2.
 

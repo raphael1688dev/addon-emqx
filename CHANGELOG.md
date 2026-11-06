@@ -13,6 +13,15 @@ Both lines share the `ghcr.io/hassio-addons/debian-base` base image.
 
 ## 6.x line (`feature/emqx-6.x`, Preview)
 
+### 6.3.2-4 — 2026-11-06
+- Raise the EMQX Retainer delivery and publish rate limits to `100000/s`
+  (upstream EMQX defaults both to `1000/s`). At the upstream default, a wildcard
+  subscription matching many retained messages (e.g. Home Assistant discovery)
+  could exceed the limit and have retained messages dropped on delivery. Add
+  `retainer_delivery_rate` and `retainer_max_publish_rate` options to override;
+  the deviation from the EMQX defaults is documented and noted in the service
+  script.
+
 ### 6.3.2-3 — 2026-11-06
 - Default the EMQX Retainer storage backend to `disc` (upstream EMQX defaults to
   `ram`). Retained messages now persist across broker restarts instead of being

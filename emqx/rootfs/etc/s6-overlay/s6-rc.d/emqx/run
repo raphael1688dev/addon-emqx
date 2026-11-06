@@ -80,6 +80,21 @@ if bashio::config.has_value 'retainer_storage_type'; then
     export EMQX_RETAINER__BACKEND__STORAGE_TYPE=$(bashio::config 'retainer_storage_type')
 fi
 
+# Retainer delivery / publish rate limits.
+# NOTE: this deviates from upstream EMQX. EMQX defaults both retainer rates to
+# "1000/s", which drops retained messages when a wildcard subscription (e.g.
+# Home Assistant discovery subscribing to homeassistant/+/+/config) needs a
+# large burst delivered at once. This add-on raises both defaults to "100000/s"
+# so retained delivery and publishing are effectively unthrottled for typical
+# home setups. Lower them to "1000/s" to restore the upstream EMQX behaviour.
+if bashio::config.has_value 'retainer_delivery_rate'; then
+    export EMQX_RETAINER__DELIVERY_RATE=$(bashio::config 'retainer_delivery_rate')
+fi
+
+if bashio::config.has_value 'retainer_max_publish_rate'; then
+    export EMQX_RETAINER__MAX_PUBLISH_RATE=$(bashio::config 'retainer_max_publish_rate')
+fi
+
 # Load custom environment variables
 for var in $(bashio::config 'env_vars|keys'); do
     name=$(bashio::config "env_vars[${var}].name")

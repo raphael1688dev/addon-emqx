@@ -62,6 +62,8 @@ ssl_cacertfile: ""
 telemetry_enable: false
 max_packet_size: "1MB"
 retainer_storage_type: disc
+retainer_delivery_rate: "100000/s"
+retainer_max_publish_rate: "100000/s"
 env_vars: []
 ```
 
@@ -119,6 +121,29 @@ broker restarts. This add-on defaults to `disc` so retained messages (e.g.
 Home Assistant MQTT discovery configs and `availability` topics) persist across
 restarts via the built-in database under `/data`. Set it to `ram` to restore
 the upstream EMQX behaviour.
+
+### Option: `retainer_delivery_rate`
+
+Maximum rate at which retained messages are **delivered** to a subscriber, e.g.
+`100000/s`. Default: `100000/s`.
+
+**Note**: This default deviates from upstream EMQX, which uses `1000/s`. At the
+upstream default, a wildcard subscription that matches many retained messages
+(for example Home Assistant discovery subscribing to `homeassistant/+/+/config`)
+can exceed the limit and have retained messages **dropped** on delivery, which
+leaves some entities missing after a reconnect. This add-on raises the default
+so delivery is effectively unthrottled for typical home setups. Set it to
+`1000/s` to restore upstream behaviour.
+
+### Option: `retainer_max_publish_rate`
+
+Maximum rate at which retained messages can be **published/stored**, e.g.
+`100000/s`. Default: `100000/s`.
+
+**Note**: This default also deviates from upstream EMQX (`1000/s`). It is raised
+for the same reason — a restart that republishes many retained messages at once
+(e.g. Home Assistant or Zigbee2MQTT re-emitting discovery configs) should not be
+throttled. Set it to `1000/s` to restore upstream behaviour.
 
 ### Option: `env_vars`
 

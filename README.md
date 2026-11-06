@@ -86,6 +86,8 @@ ssl_cacertfile: ""
 telemetry_enable: false
 max_packet_size: "1MB"
 retainer_storage_type: disc
+retainer_delivery_rate: "100000/s"
+retainer_max_publish_rate: "100000/s"
 env_vars: []
 ```
 
@@ -103,6 +105,8 @@ env_vars: []
 - **`telemetry_enable`**: Enables or disables anonymous telemetry reporting to EMQX (default: `false`).
 - **`max_packet_size`**: Maximum allowed MQTT packet size (default: `1MB`, e.g., `5MB`, `10MB`).
 - **`retainer_storage_type`**: Storage backend for retained messages (`disc` or `ram`, default: `disc`). Note: upstream EMQX defaults to `ram`, which loses retained messages on broker restart; this add-on defaults to `disc` so they persist across restarts. Set to `ram` for upstream behaviour.
+- **`retainer_delivery_rate`**: Max rate retained messages are delivered to a subscriber (default: `100000/s`). Note: upstream EMQX uses `1000/s`, which can drop retained messages on a large wildcard subscription (e.g. Home Assistant discovery), leaving entities missing; this add-on raises it. Set to `1000/s` for upstream behaviour.
+- **`retainer_max_publish_rate`**: Max rate retained messages can be published/stored (default: `100000/s`). Note: upstream EMQX uses `1000/s`; raised here so restart-time bursts of retained publishes are not throttled. Set to `1000/s` for upstream behaviour.
 - **`env_vars`**: Custom environment variables for advanced HOCON configuration. Each entry must start with `EMQX_` (e.g., `EMQX_NODE__DATA_DIR`).
 
 

@@ -13,6 +13,16 @@ Both lines share the `ghcr.io/hassio-addons/debian-base` base image.
 
 ## 6.x line (`feature/emqx-6.x`, Preview)
 
+### 6.3.2-5 — 2026-11-10
+- Security: draw a random Erlang node cookie once per installation and keep it
+  in `/data/emqx/node.cookie`, instead of deriving it from the hostname. The
+  add-on uses host networking, so the node's distribution port is reachable
+  from the LAN and a hostname-based cookie was guessable. Set
+  `EMQX_NODE__COOKIE` through `env_vars` to use a specific cookie.
+- Security: no longer log the values of `env_vars` entries (only their names),
+  since they may hold secrets.
+- Correct the base image reference in the README to `debian-base` 9.5.2.
+
 ### 6.3.2-4 — 2026-11-06
 - Raise the EMQX Retainer delivery and publish rate limits to `100000/s`
   (upstream EMQX defaults both to `1000/s`). At the upstream default, a wildcard
@@ -48,6 +58,19 @@ Both lines share the `ghcr.io/hassio-addons/debian-base` base image.
   state is reset on upgrade — this line is kept as a separate preview.
 
 ## 5.x line (`main`, stable)
+
+### 5.10.5-7 — 2026-11-10
+- Security: draw a random Erlang node cookie once per installation and keep it
+  in `/data/emqx/node.cookie`, instead of deriving it from the hostname. The
+  add-on uses host networking, so the node's distribution port is reachable
+  from the LAN and a hostname-based cookie was guessable. Set
+  `EMQX_NODE__COOKIE` through `env_vars` to use a specific cookie.
+- Security: no longer log the values of `env_vars` entries (only their names),
+  since they may hold secrets.
+- Record the running EMQX version in `/data/emqx/.version`, so that a later
+  move to the 6.x line can detect the 5.x → 6.x upgrade (previously only the
+  6.x line wrote this file, so the upgrade notice could never fire).
+- Correct the base image reference in the README to `debian-base` 9.5.2.
 
 ### 5.10.5-6 — 2026-11-06
 - Raise the EMQX Retainer delivery and publish rate limits to `100000/s`

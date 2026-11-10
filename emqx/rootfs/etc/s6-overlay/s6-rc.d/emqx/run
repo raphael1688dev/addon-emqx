@@ -4,11 +4,25 @@
 # Home Assistant Community Add-on: EMQX
 # Runs the EMQX broker
 # ==============================================================================
+readonly node_cookie_file="/data/emqx/node.cookie"
+
 bashio::log.info 'Starting EMQX...'
+
+# The Erlang cookie guards access to the node's distribution port, and this
+# add-on runs with host networking, so that port is reachable from the LAN.
+# A cookie derived from the hostname is guessable, so a random one is drawn
+# once per installation and kept in /data. Set EMQX_NODE__COOKIE through the
+# env_vars option to use a specific cookie instead (e.g. for clustering).
+if [ -s "${node_cookie_file}" ]; then
+    node_cookie=$(cat "${node_cookie_file}")
+else
+    node_cookie=$(od -vAn -tx1 -N32 /dev/urandom | tr -d ' \n')
+    (umask 077 && printf '%s' "${node_cookie}" > "${node_cookie_file}")
+fi
 
 export EMQX_HOST=$(bashio::info.hostname)
 export EMQX_NAME="emqx"
-export EMQX_NODE__COOKIE="${EMQX_HOST}"
+export EMQX_NODE__COOKIE="${node_cookie}"
 export EMQX_NODE__DATA_DIR="/data/emqx/data"
 export EMQX_NODE__ETC_DIR="/data/emqx/etc"
 export EMQX_NODE__NAME="${EMQX_NAME}@${EMQX_HOST}.local"
@@ -95,11 +109,12 @@ if bashio::config.has_value 'retainer_max_publish_rate'; then
     export EMQX_RETAINER__MAX_PUBLISH_RATE=$(bashio::config 'retainer_max_publish_rate')
 fi
 
-# Load custom environment variables
+# Load custom environment variables.
+# Only the name is logged: values may hold secrets (passwords, cookies, keys).
 for var in $(bashio::config 'env_vars|keys'); do
     name=$(bashio::config "env_vars[${var}].name")
     value=$(bashio::config "env_vars[${var}].value")
-    bashio::log.info "Setting ${name} to ${value}"
+    bashio::log.info "Setting ${name}"
     export "${name}=${value}"
 done
 

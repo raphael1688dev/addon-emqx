@@ -10,3 +10,9 @@ mkdir -p \
   /data/emqx/log \
   /data/emqx/plugins
 
+# Record the running EMQX version. The 6.x line reads this file to detect a
+# 5.x -> 6.x upgrade, so the 5.x line has to write it too.
+VERSION_FILE="/data/emqx/.version"
+CURRENT_VERSION="5.10.5"
+
+echo "${CURRENT_VERSION}" > "${VERSION_FILE}"

@@ -30,10 +30,13 @@ Config flows one direction: **HA add-on options → bashio → `EMQX_*` env vars
 
 1. `emqx/config.yaml` declares the add-on options and their `schema` (the HA UI form).
 2. `emqx/rootfs/etc/s6-overlay/s6-rc.d/init-emqx/run` (oneshot) creates the persistent dirs under
-   `/data/emqx/{data,etc,log,plugins}` and records the EMQX version in `/data/emqx/.version` to
-   detect 5.x→6.x upgrades.
+   `/data/emqx/{data,etc,log,plugins}` and records the EMQX version in `/data/emqx/.version`.
+   Both branches write the file; the 6.x branch reads it to detect a 5.x→6.x upgrade.
 3. `emqx/rootfs/etc/s6-overlay/s6-rc.d/emqx/run` (longrun) reads each option with `bashio::config`
-   and exports it as an `EMQX_*` env var, then `exec`s `/opt/emqx/bin/emqx foreground`.
+   and exports it as an `EMQX_*` env var, then `exec`s `/opt/emqx/bin/emqx foreground`. It also
+   draws a random Erlang node cookie once per installation and keeps it in
+   `/data/emqx/node.cookie` (the add-on uses host networking, so the cookie must not be guessable).
+   Values of `env_vars` entries are never logged, only their names.
 
 The `EMQX_*` names use EMQX's HOCON convention where `__` = nesting (e.g.
 `EMQX_LISTENERS__TCP__DEFAULT__BIND`). The `env_vars` option lets users set any `EMQX_*` var
@@ -49,7 +52,8 @@ When bumping EMQX or the base image, follow the repo's existing release conventi
   - `emqx/build.yaml` — `build_from` for both `aarch64` and `amd64`
   - `emqx/config.yaml` — `version` and `description`
   - `repository.json` — `name`
-  - (6.x only) `emqx/rootfs/.../init-emqx/run` — `CURRENT_VERSION`, used for upgrade detection
+  - `emqx/rootfs/.../init-emqx/run` — `CURRENT_VERSION` (EMQX version only, no `-N` suffix), used
+    for upgrade detection
   - `CHANGELOG.md` — add an entry under the matching version line (6.x releases under the 6.x
     section, 5.x under the 5.x section). Like this file, `CHANGELOG.md` is kept identical on both
     branches, so the new entry is added on whichever branch you release and then carried to the other.

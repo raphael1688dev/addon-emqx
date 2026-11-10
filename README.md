@@ -50,7 +50,7 @@ This fork of the EMQX Add-on provides an upgraded, reliable, and production-read
   - Full BSL 1.1 enterprise feature suite unlocked: high-throughput MQTT Streams, Apache Parquet data sinks, and native Durable Storage engine.
   - Advanced Feature Gates and hardened security with a PCRE2-powered Rule Engine.
 - **Latest Debian 13 Base Image**:
-  - Built on `ghcr.io/hassio-addons/debian-base:9.5.1` (Debian 13.7 Trixie).
+  - Built on `ghcr.io/hassio-addons/debian-base:9.5.2` (Debian 13.7 Trixie).
   - Uses S6-Overlay `3.2.3.0` and the latest `bashio` library for enhanced supervisor compatibility.
 - **Persistent Log Storage**:
   - Automatically redirects and stores EMQX logs under `/data/emqx/log`, ensuring logs survive container restarts and add-on updates.

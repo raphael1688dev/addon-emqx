@@ -1,8 +1,8 @@
 ---
 name: EMQX
-version: 6.3.3-0
+version: 6.3.3-1
 slug: emqx
-description: Version 6.3.3-0 (EMQX 6.x LTS)
+description: Version 6.3.3-1 (EMQX 6.x LTS)
 url: https://github.com/raphael1688dev/addon-emqx
 startup: services
 ingress: true
@@ -16,7 +16,7 @@ arch:
   - amd64
 map:
   - ssl
-  - addon_config:rw
+  - app_config:rw
 options:
   mqtt_port: 1883
   mqtts_port: 8883

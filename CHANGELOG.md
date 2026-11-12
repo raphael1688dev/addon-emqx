@@ -13,6 +13,14 @@ Both lines share the `ghcr.io/hassio-addons/debian-base` base image.
 
 ## 6.x line (`feature/emqx-6.x`, Preview)
 
+### 6.3.3-1 — 2026-11-12
+- Rename the `map` entry `addon_config:rw` to `app_config:rw`, the name used
+  since Home Assistant Supervisor 2026.07.1. This silences the Supervisor
+  warning "uses legacy map type 'addon_config'". Both names mount the same
+  folder at `/config` inside the container, and the add-on keeps all of its
+  state under `/data`, so no path or stored data changes. Supervisor
+  2026.07.0 and older do not know `app_config`.
+
 ### 6.3.3-0 — 2026-11-12
 - Upgrade EMQX to 6.3.3 (Enterprise 6.x LTS patch release: lower CPU and
   memory use, 42 enhancements and 130 bug fixes).
@@ -70,6 +78,14 @@ Both lines share the `ghcr.io/hassio-addons/debian-base` base image.
   state is reset on upgrade — this line is kept as a separate preview.
 
 ## 5.x line (`main`, stable)
+
+### 5.10.5-8 — 2026-11-12
+- Rename the `map` entry `addon_config:rw` to `app_config:rw`, the name used
+  since Home Assistant Supervisor 2026.07.1. This silences the Supervisor
+  warning "uses legacy map type 'addon_config'". Both names mount the same
+  folder at `/config` inside the container, and the add-on keeps all of its
+  state under `/data`, so no path or stored data changes. Supervisor
+  2026.07.0 and older do not know `app_config`.
 
 ### 5.10.5-7 — 2026-11-10
 - Security: draw a random Erlang node cookie once per installation and keep it

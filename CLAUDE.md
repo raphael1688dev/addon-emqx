@@ -16,7 +16,7 @@ The two long-lived branches track two different EMQX major versions. Keep both m
 collapse one into the other.
 
 - **`main`** → EMQX **5.x LTS** (currently 5.10.5; 5.10 is the final 5.x minor). The stable release.
-- **`feature/emqx-6.x`** → EMQX **6.x LTS** (currently 6.3.2). Labelled "(Preview)" in
+- **`feature/emqx-6.x`** → EMQX **6.x LTS** (currently 6.3.3). Labelled "(Preview)" in
   `repository.json`. EMQX 6.x introduces a new durable-storage engine, so 5.x durable session state
   is reset on upgrade — this is why 6.x is a separate preview line rather than a bump on `main`.
 

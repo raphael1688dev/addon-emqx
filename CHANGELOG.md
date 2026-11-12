@@ -13,6 +13,18 @@ Both lines share the `ghcr.io/hassio-addons/debian-base` base image.
 
 ## 6.x line (`feature/emqx-6.x`, Preview)
 
+### 6.3.3-0 — 2026-11-12
+- Upgrade EMQX to 6.3.3 (Enterprise 6.x LTS patch release: lower CPU and
+  memory use, 42 enhancements and 130 bug fixes).
+- Upstream security fix: cluster RPC no longer falls back to sending the
+  Erlang cookie to the peer when the challenge-response handshake fails.
+- Upstream behaviour changes worth knowing (see the EMQX 6.3.3 release notes):
+  `$queue/...` and `$stream/...` subscriptions no longer auto-create a queue or
+  stream; on MQTT WebSocket listeners, `websocket.max_frame_size = infinity`
+  now means twice `mqtt.max_packet_size` (2MB with this add-on's 1MB default).
+- The retainer configuration schema is unchanged, so this add-on's retainer
+  defaults (`disc`, `100000/s`) still apply.
+
 ### 6.3.2-5 — 2026-11-10
 - Security: draw a random Erlang node cookie once per installation and keep it
   in `/data/emqx/node.cookie`, instead of deriving it from the hostname. The

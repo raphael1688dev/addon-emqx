@@ -6,43 +6,58 @@ on:
     - cron: '0 2 * * 1'
   workflow_dispatch:
 
+# Scheduled runs only ever start from the default branch (main), so each
+# version line is checked out explicitly below. Without this the 6.x line
+# (feature/emqx-6.x) would never be checked.
 jobs:
   check-updates:
-    name: Check EMQX & Base Image Releases
+    name: Check ${{ matrix.branch }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
       issues: write
+    strategy:
+      fail-fast: false
+      matrix:
+        branch:
+          - main
+          - feature/emqx-6.x
 
     steps:
-      - name: Checkout repository
+      - name: Checkout ${{ matrix.branch }}
         uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.branch }}
 
       - name: Inspect current local versions
         id: local
+        env:
+          BRANCH: ${{ matrix.branch }}
         run: |
           CURRENT_EMQX=$(grep 'ARG EMQX_VERSION=' emqx/Dockerfile | cut -d'"' -f2)
           CURRENT_MAJOR=$(echo "${CURRENT_EMQX}" | cut -d'.' -f1)
           CURRENT_BASE=$(grep 'ARG BUILD_FROM=' emqx/Dockerfile | cut -d':' -f2 | awk '{print $1}')
-          
+
           echo "current_emqx=${CURRENT_EMQX}" >> "$GITHUB_OUTPUT"
           echo "current_major=${CURRENT_MAJOR}" >> "$GITHUB_OUTPUT"
           echo "current_base=${CURRENT_BASE}" >> "$GITHUB_OUTPUT"
-          
-          echo "### 📦 Current Local Add-on Configuration" >> "$GITHUB_STEP_SUMMARY"
+
+          echo "### 📦 Current Add-on Configuration (\`${BRANCH}\`)" >> "$GITHUB_STEP_SUMMARY"
           echo "- **EMQX Version**: \`${CURRENT_EMQX}\` (Series: \`${CURRENT_MAJOR}.x\`)" >> "$GITHUB_STEP_SUMMARY"
           echo "- **Debian Base Image**: \`${CURRENT_BASE}\`" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Check upstream releases
         id: upstream
+        env:
+          CURRENT_MAJOR: ${{ steps.local.outputs.current_major }}
         run: |
           # 1. Check Debian Base
           LATEST_BASE=$(curl -sL https://api.github.com/repos/hassio-addons/addon-debian-base/releases/latest | jq -r .tag_name | sed 's/^v//')
           echo "latest_base=${LATEST_BASE}" >> "$GITHUB_OUTPUT"
-          
-          # 2. Check EMQX for the current major branch
-          CURRENT_MAJOR="${{ steps.local.outputs.current_major }}"
-          LATEST_EMQX=$(curl -sL https://api.github.com/repos/emqx/emqx/releases?per_page=50 | jq -r '.[].tag_name' | sed -E 's/^[ev]//' | grep "^${CURRENT_MAJOR}\." | sort -V | tail -n 1)
+
+          # 2. Check EMQX for this branch's major version. 100 releases keeps
+          # the older major in range while the newer one keeps releasing.
+          LATEST_EMQX=$(curl -sL "https://api.github.com/repos/emqx/emqx/releases?per_page=100" | jq -r '.[].tag_name' | sed -E 's/^[ev]//' | grep "^${CURRENT_MAJOR}\." | sort -V | tail -n 1)
           echo "latest_emqx=${LATEST_EMQX}" >> "$GITHUB_OUTPUT"
 
           echo "" >> "$GITHUB_STEP_SUMMARY"
@@ -53,14 +68,15 @@ jobs:
       - name: Evaluate differences and notify
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ matrix.branch }}
+          CURR_EMQX: ${{ steps.local.outputs.current_emqx }}
+          LATEST_EMQX: ${{ steps.upstream.outputs.latest_emqx }}
+          CURR_BASE: ${{ steps.local.outputs.current_base }}
+          LATEST_BASE: ${{ steps.upstream.outputs.latest_base }}
         run: |
-          CURR_EMQX="${{ steps.local.outputs.current_emqx }}"
-          LATEST_EMQX="${{ steps.upstream.outputs.latest_emqx }}"
-          CURR_BASE="${{ steps.local.outputs.current_base }}"
-          LATEST_BASE="${{ steps.upstream.outputs.latest_base }}"
-
           UPDATE_FOUND=false
-          BODY="## 🔔 Upstream Updates Detected\n\n"
+          BODY="## 🔔 Upstream Updates Detected (\`${BRANCH}\`)\n\n"
 
           if [ "${CURR_EMQX}" != "${LATEST_EMQX}" ] && [ -n "${LATEST_EMQX}" ]; then
             UPDATE_FOUND=true
@@ -72,22 +88,31 @@ jobs:
             BODY="${BODY}- 📦 **Debian Base Image**: Current base \`${CURR_BASE}\` can be upgraded to \`${LATEST_BASE}\`.\n  - [Debian Base Releases](https://github.com/hassio-addons/addon-debian-base/releases)\n"
           fi
 
-          if [ "${UPDATE_FOUND}" = "true" ]; then
-            echo "" >> "$GITHUB_STEP_SUMMARY"
-            echo "⚠️ **Updates are available!**" >> "$GITHUB_STEP_SUMMARY"
-            printf "%b\n" "${BODY}" >> "$GITHUB_STEP_SUMMARY"
-
-            # Check if an issue with the same title already exists
-            TITLE="[Upstream Update] New EMQX or Base Image version available"
-            EXISTING=$(gh issue list --search "${TITLE}" --state open --json number -q '.[0].number')
-
-            if [ -z "${EXISTING}" ]; then
-              gh issue create --title "${TITLE}" --body "$(printf "%b" "${BODY}")"
-              echo "Created GitHub Issue for the updates."
-            else
-              echo "Issue #${EXISTING} already open. Skipping duplication."
-            fi
-          else
+          if [ "${UPDATE_FOUND}" != "true" ]; then
             echo "" >> "$GITHUB_STEP_SUMMARY"
             echo "✅ **All components are currently up to date!**" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
           fi
+
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "⚠️ **Updates are available!**" >> "$GITHUB_STEP_SUMMARY"
+          printf "%b\n" "${BODY}" >> "$GITHUB_STEP_SUMMARY"
+
+          # Open an issue only when GitHub Issues are enabled on the repository.
+          if [ "$(gh api "repos/${REPO}" --jq .has_issues)" = "true" ]; then
+            TITLE="[Upstream Update] ${BRANCH}: new EMQX or base image version available"
+            EXISTING=$(gh issue list --repo "${REPO}" --search "${TITLE} in:title" --state open --json number -q '.[0].number')
+            if [ -z "${EXISTING}" ]; then
+              gh issue create --repo "${REPO}" --title "${TITLE}" --body "$(printf "%b" "${BODY}")"
+              echo "Created a GitHub issue for the updates."
+            else
+              echo "Issue #${EXISTING} is already open; not opening another."
+            fi
+          else
+            echo "GitHub Issues are disabled on this repository; no issue opened."
+          fi
+
+          # Fail the run while an update is pending, so GitHub sends its
+          # workflow-failure notification even when Issues are disabled.
+          echo "::error title=Upstream update available (${BRANCH})::EMQX ${CURR_EMQX} -> ${LATEST_EMQX}, debian-base ${CURR_BASE} -> ${LATEST_BASE}"
+          exit 1

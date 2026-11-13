@@ -15,10 +15,12 @@ runs the image; there is no local compile/lint/test step and no CI build workflo
 The two long-lived branches track two different EMQX major versions. Keep both maintained; do not
 collapse one into the other.
 
-- **`main`** → EMQX **5.x LTS** (currently 5.10.5; 5.10 is the final 5.x minor). The stable release.
-- **`feature/emqx-6.x`** → EMQX **6.x LTS** (currently 6.3.3). Labelled "(Preview)" in
+- **`main`** → EMQX **5.x LTS** (5.10 is the final 5.x minor). The stable release.
+- **`feature/emqx-6.x`** → EMQX **6.x LTS**. Labelled "(Preview)" in
   `repository.json`. EMQX 6.x introduces a new durable-storage engine, so 5.x durable session state
   is reset on upgrade — this is why 6.x is a separate preview line rather than a bump on `main`.
+
+Each branch's current EMQX version is `ARG EMQX_VERSION` in its `emqx/Dockerfile`.
 
 The two branches' `Dockerfile`s download EMQX from **different sources**:
 - 6.x: `https://packages.emqx.io/emqx-ee/${EMQX_VERSION}/emqx-enterprise-${EMQX_VERSION}-debian13-${ARCH}.tar.gz`
@@ -45,7 +47,8 @@ directly; the schema restricts names to `^EMQX_([A-Z0-9_])+$`. Runtime state liv
 
 ## Releasing / bumping versions
 
-When bumping EMQX or the base image, follow the repo's existing release convention (see `git log`):
+Every release follows the repo's existing convention (see `git log`), whether it bumps EMQX or the
+base image or only changes the add-on itself:
 
 - Update these files **together** so the add-on version stays consistent:
   - `emqx/Dockerfile` — `ARG EMQX_VERSION` and/or `ARG BUILD_FROM`
@@ -54,6 +57,7 @@ When bumping EMQX or the base image, follow the repo's existing release conventi
   - `repository.json` — `name`
   - `emqx/rootfs/.../init-emqx/run` — `CURRENT_VERSION` (EMQX version only, no `-N` suffix), used
     for upgrade detection
+  - `README.md` — the EMQX version and `debian-base` tag under "Key Features & Enhancements"
   - `CHANGELOG.md` — add an entry under the matching version line (6.x releases under the 6.x
     section, 5.x under the 5.x section). Like this file, `CHANGELOG.md` is kept identical on both
     branches, so the new entry is added on whichever branch you release and then carried to the other.
@@ -66,7 +70,12 @@ and, for base image bumps, the `ghcr.io/hassio-addons/debian-base:<tag>` manifes
 
 ## Automation
 
-- `.github/workflows/check-upstream-updates.yaml` — runs weekly, compares the `EMQX_VERSION` and
-  `BUILD_FROM` in `emqx/Dockerfile` against the latest upstream EMQX (for the current major) and
-  latest `debian-base` release, and opens a GitHub issue when a newer version exists.
-- `.github/renovate.json` — Renovate dependency updates.
+- `.github/workflows/check-upstream-updates.yaml` — runs weekly and checks both version lines: for
+  each of `main` and `feature/emqx-6.x` it compares that branch's `EMQX_VERSION` and `BUILD_FROM`
+  in `emqx/Dockerfile` against the latest upstream EMQX for its major and the latest `debian-base`
+  release. Scheduled runs only start from `main`, so the workflow checks out each branch itself;
+  keep the file identical on both branches. When a newer version exists the run fails, so GitHub
+  sends its failure notification, and it also opens an issue if GitHub Issues are enabled.
+- `.github/renovate.json` — Renovate config (regex managers for `BUILD_FROM`, the `build.yaml`
+  images and `EMQX_VERSION`). It only acts if the Renovate app is installed on the repository;
+  don't count on it to surface updates.

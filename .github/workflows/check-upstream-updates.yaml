@@ -49,15 +49,34 @@ jobs:
       - name: Check upstream releases
         id: upstream
         env:
+          # Query the GitHub API with the job token. Anonymous requests share
+          # the runner IP's small rate limit and can get an error back instead
+          # of release data.
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ matrix.branch }}
+          CURRENT_EMQX: ${{ steps.local.outputs.current_emqx }}
           CURRENT_MAJOR: ${{ steps.local.outputs.current_major }}
+          CURRENT_BASE: ${{ steps.local.outputs.current_base }}
         run: |
           # 1. Check Debian Base
-          LATEST_BASE=$(curl -sL https://api.github.com/repos/hassio-addons/addon-debian-base/releases/latest | jq -r .tag_name | sed 's/^v//')
-          echo "latest_base=${LATEST_BASE}" >> "$GITHUB_OUTPUT"
+          LATEST_BASE=$(gh api repos/hassio-addons/addon-debian-base/releases/latest --jq .tag_name | sed 's/^v//')
 
           # 2. Check EMQX for this branch's major version. 100 releases keeps
           # the older major in range while the newer one keeps releasing.
-          LATEST_EMQX=$(curl -sL "https://api.github.com/repos/emqx/emqx/releases?per_page=100" | jq -r '.[].tag_name' | sed -E 's/^[ev]//' | grep "^${CURRENT_MAJOR}\." | sort -V | tail -n 1)
+          LATEST_EMQX=$(gh api "repos/emqx/emqx/releases?per_page=100" --jq '.[].tag_name' | sed -E 's/^[ev]//' | grep "^${CURRENT_MAJOR}\." | sort -V | tail -n 1)
+
+          # A failed lookup must not be read as a new version: every value has
+          # to be a plain x.y.z version, or the run fails as a lookup failure.
+          VERSION_RE='^[0-9]+\.[0-9]+\.[0-9]+$'
+          for pair in "local EMQX=${CURRENT_EMQX}" "local debian-base=${CURRENT_BASE}" \
+                      "upstream EMQX ${CURRENT_MAJOR}.x=${LATEST_EMQX}" "upstream debian-base=${LATEST_BASE}"; do
+            if ! [[ "${pair#*=}" =~ ${VERSION_RE} ]]; then
+              echo "::error title=Version lookup failed (${BRANCH})::${pair%%=*} is '${pair#*=}', not a version; nothing was compared."
+              exit 1
+            fi
+          done
+
+          echo "latest_base=${LATEST_BASE}" >> "$GITHUB_OUTPUT"
           echo "latest_emqx=${LATEST_EMQX}" >> "$GITHUB_OUTPUT"
 
           echo "" >> "$GITHUB_STEP_SUMMARY"
